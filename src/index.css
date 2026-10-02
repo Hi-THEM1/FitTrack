@@ -1,0 +1,191 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@800&family=Crimson+Pro:wght@600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-elevated: var(--elevated);
+  --color-primary: var(--primary);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-gold: var(--gold);
+  --color-danger: var(--danger);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-text-dim: var(--text-dim);
+  --color-border: var(--border);
+}
+
+:root {
+  /* THE FORGE — DARK MODE */
+  --canvas: #0A0A0A;
+  --surface: #141414;
+  --elevated: #1C1C1C;
+  --primary: #FF4D00;
+  --success: #00C853;
+  --warning: #FF6D00;
+  --gold: #E6A700;
+  --text-main: #FAFAFA;
+  --text-muted: #A3A3A3;
+  --text-dim: #6B6B6B;
+  --danger: #EF4444;
+  --border: rgba(255, 255, 255, 0.04);
+  
+  /* Material Specs */
+  --glass-bg: rgba(20, 20, 20, 0.7);
+  --glass-blur: 20px;
+  --glass-border: 1px solid rgba(255, 255, 255, 0.04);
+  --glass-inner-shadow: inset 0 0 0 1px rgba(255, 77, 0, 0.05);
+  --glass-outer-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.5);
+  --radius-card: 24px;
+  --radius-dock: 40px;
+  --radius-chip: 16px;
+
+  /* Typography Fallbacks */
+  --font-hero: 'JetBrains Mono', monospace;
+  --font-head: 'Neue Haas Grotesk', 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Physics */
+  --mass: 1;
+  --tension: 0.12;
+  --damping: 0.82;
+  --friction: 0.94;
+}
+
+.light {
+  /* THE SANCTUARY — LIGHT MODE */
+  --canvas: #F5F3F0;
+  --surface: #FFFFFF;
+  --elevated: #FAFAF8;
+  --primary: #E65100;
+  --success: #2E7D32;
+  --warning: #E65100;
+  --gold: #B86B00;
+  --text-main: #1A1A1A;
+  --text-muted: #5C5C5C;
+  --text-dim: #8A8A8A;
+  --danger: #DC2626;
+  --border: rgba(0, 0, 0, 0.04);
+
+  /* Material Specs */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-blur: 12px;
+  --glass-border: 1px solid rgba(0, 0, 0, 0.04);
+  --glass-inner-shadow: none;
+  --glass-outer-shadow: 0 4px 12px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
+
+  /* Typography */
+  --font-hero: 'Crimson Pro', serif;
+  --font-head: 'Crimson Pro', serif;
+}
+
+body {
+  margin: 0;
+  background-color: var(--canvas);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  transition: background-color 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Canvas Texture for Light Mode */
+.light body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* 2.5D Spatial UI Base */
+.spatial-container {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: var(--glass-border);
+  box-shadow: var(--glass-outer-shadow), var(--glass-inner-shadow);
+  border-radius: var(--radius-card);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px) translateZ(10px);
+  box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.6);
+}
+
+.light .glass-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+/* Typography Utilities */
+.font-hero { font-family: var(--font-hero); font-feature-settings: "tnum" 1; }
+.font-display { font-family: var(--font-head); letter-spacing: -0.02em; }
+.font-micro { font-family: var(--font-body); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; }
+
+/* Theme Ripple Transition */
+.ripple-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: normal;
+}
+
+.ripple-circle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: var(--canvas);
+  transform: scale(0);
+  transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.ripple-circle.active {
+  transform: scale(3000);
+}
+
+/* Animations */
+@keyframes pulse-orange {
+  0% { box-shadow: 0 0 0 0 rgba(255, 77, 0, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 77, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 77, 0, 0); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transform: translateX(-100%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
